@@ -6,14 +6,12 @@
 	Declare @ExecutionType varchar(100)
 	Declare @AvgFragmentation varchar(100)
  
- 
- 
     DECLARE index_cursor CURSOR FOR
        SELECT 'ALTER INDEX [' + ix.name + '] ON [' + s.name + '].[' + t.name + '] ' +
        CASE
-              WHEN ps.avg_fragmentation_in_percent > 15			--Á†¥Á¢éÁ®ãÂ∫¶ Âà§Êñ∑‰ΩøÁî®ÈáçÁµÑ() ÈÇÑÊòØ‰ΩøÁî® ÈáçÂª∫()
-              THEN 'REBUILD'									--ÈáçÂª∫
-              ELSE 'REORGANIZE'									--ÈáçÁµÑ
+              WHEN ps.avg_fragmentation_in_percent > 15			--Ø}∏Hµ{´◊ ßP¬_®œ•Œ≠´≤’() ¡Ÿ¨O®œ•Œ ≠´´ÿ()
+              THEN 'REBUILD'									--≠´´ÿ
+              ELSE 'REORGANIZE'									--≠´≤’
        END +
        CASE
               WHEN pc.partition_count > 1
@@ -22,7 +20,7 @@
        END as ExecutionSyntax
 	   ,avg_fragmentation_in_percent,
 	   CASE
-              WHEN ps.avg_fragmentation_in_percent > 15			--Á†¥Á¢éÁ®ãÂ∫¶ Âà§Êñ∑‰ΩøÁî®ÈáçÁµÑ() ÈÇÑÊòØ‰ΩøÁî® ÈáçÂª∫()
+              WHEN ps.avg_fragmentation_in_percent > 15			--Ø}∏Hµ{´◊ ßP¬_®œ•Œ≠´≤’() ¡Ÿ¨O®œ•Œ ≠´´ÿ()
               THEN 'REBUILD'
               ELSE 'REORGANIZE'
        END as ExecutionType
@@ -54,15 +52,15 @@
 					  ) pc
 			   ON     t.object_id              = pc.object_id
 				  AND ix.index_id              = pc.index_id
-		WHERE  ps.avg_fragmentation_in_percent > 10						--ÈúÄË¶ÅÈÄ≤Ë°åÈáçÁµÑÊàñÈáçÂª∫ÁöÑÁ†¥Á¢éÁ®ãÂ∫¶ Ê¢ù‰ª∂
+		WHERE  ps.avg_fragmentation_in_percent > 10						--ª›≠n∂i¶Ê≠´≤’©Œ≠´´ÿ™∫Ø}∏Hµ{´◊ ±¯•Û
 		   AND ix.name IS NOT NULL
  
     OPEN index_cursor
     FETCH NEXT FROM index_cursor INTO @ExecutionSyntax,@AvgFragmentation,@ExecutionType,@objectId,@IndexName,@TableName,@SchemaName
     WHILE @@FETCH_STATUS = 0
         Begin
-			--ÈáçÊï¥Ë≥áË®ä
-    	    print '-- process: '+@TableName+' , IndexName: '+@IndexName+' , SchemaName: '+@SchemaName +' , AvgFragmentationInPercent: '+@AvgFragmentation+' , ExecutionType: '+@ExecutionType
+			--≠´æ„∏Í∞T
+    	    print '-- TableName: '+@TableName+' , IndexName: '+@IndexName+' , SchemaName: '+@SchemaName +' , AvgFragmentationInPercent: '+@AvgFragmentation+' , ExecutionType: '+@ExecutionType
 			print '   ExecutionSyntax: '+@ExecutionSyntax
 			exec(@ExecutionSyntax)
             FETCH NEXT FROM index_cursor INTO @ExecutionSyntax,@AvgFragmentation,@ExecutionType,@objectId,@IndexName,@TableName,@SchemaName 
